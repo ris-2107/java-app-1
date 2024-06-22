@@ -9,4 +9,9 @@ public class WelcomeController {
     public String Welcome() {
         return "HELLO_WORLD";
     }
+
+    @GetMapping("/welcome-2")
+    public String Welcome2() {
+        return "HELLO_WORLD_2";
+    }
 }
