@@ -5,18 +5,18 @@ import com.deliverreez.javaservice.dtos.DelivereezResponse;
 import com.deliverreez.javaservice.services.userservice.src.model.User;
 import com.deliverreez.javaservice.services.userservice.src.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/user-service/r")
@@ -24,30 +24,39 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RestrictedApiController {
 
-
-    private UserService userService;
+    private static final Logger log = LoggerFactory.getLogger(RestrictedApiController.class);
+    private final UserService userService;
 
     @PostMapping("/register-user")
-    public Mono<ResponseEntity<DelivereezResponse<User>>> registerUser(@Valid @RequestBody User user) {
-        return userService.registerUser(user)
-                .map(registeredUser -> ResponseEntity.status(HttpStatus.CREATED)
-                        .body(new DelivereezResponse<>("success", "User registered successfully", registeredUser)));
+    public ResponseEntity<DelivereezResponse<User>> registerUser(@Valid @RequestBody User user) {
+        log.info("Request received to register user");
+        User registeredUser = userService.registerUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DelivereezResponse<>("success", "User registered successfully", registeredUser));
     }
 
     @GetMapping("/users/email/{email}")
-    public Mono<ResponseEntity<DelivereezResponse<User>>> getUserByEmail(@PathVariable String email) {
-        return userService.getUsersByEmail(email)
-                .map(user -> ResponseEntity.ok()
-                        .body(new DelivereezResponse<>("success", "User found", user)))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    public ResponseEntity<DelivereezResponse<User>> getUserByEmail(@PathVariable String email) {
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isPresent()) {
+            return ResponseEntity.ok().body(new DelivereezResponse<>("success", "User found", userOpt.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new DelivereezResponse<>("error", "User not found", null));
+        }
     }
 
     @GetMapping("/users")
-    public Mono<ResponseEntity<DelivereezResponse<Flux<User>>>> getAllUsers() {
-        return userService.getAllUsers()
-                .collectList()
-                .map(users -> ResponseEntity.ok()
-                        .body(new DelivereezResponse<>("success", "All users retrieved", Flux.fromIterable(users))));
+    public CompletableFuture<ResponseEntity<DelivereezResponse<List<User>>>> getAllUsers() {
+        log.info("Start getAllUsers");
+
+        return CompletableFuture.supplyAsync(() -> {
+            List<User> users = userService.getAllUsers();
+            DelivereezResponse<List<User>> response = new DelivereezResponse<>("success", "All users retrieved", users);
+            log.info("End getAllUsers");
+            return ResponseEntity.ok(response);
+        }).exceptionally(ex -> {
+            log.error("Error occurred while fetching users", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new DelivereezResponse<>("error", "Failed to fetch users", null));
+        });
     }
 
     @PostMapping("/get-user")

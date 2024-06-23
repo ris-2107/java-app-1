@@ -1,19 +1,20 @@
 package com.deliverreez.javaservice.services.userservice.src.repository;
 
 import com.deliverreez.javaservice.services.userservice.src.model.User;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface UserRepository extends ReactiveMongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, String> {
 
-    Mono<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-    Mono<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    Flux<User> findByActiveTrue();
+    List<User> findByActiveTrue();
 
-    Flux<User> findByRolesContaining(String role);
+    List<User> findByRolesContaining(String role);
 }

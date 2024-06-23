@@ -1,8 +1,9 @@
 package com.deliverreez.javaservice.services.userservice.src.service;
 
 import com.deliverreez.javaservice.services.userservice.src.model.User;
-import reactor.core.publisher.Mono;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface IUserService {
-    Mono<User> registerUser(User user);
+    User registerUser(User user);
 }
