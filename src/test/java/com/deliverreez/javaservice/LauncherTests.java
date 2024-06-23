@@ -1,4 +1,4 @@
-package com.example.javaapp1;
+package com.deliverreez.javaservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

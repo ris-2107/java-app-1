@@ -1,4 +1,4 @@
-package com.example.javaapp1.utils;
+package com.deliverreez.javaservice.utils;
 
 public enum ClusterType {
     LOCAL,
