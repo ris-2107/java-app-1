@@ -16,7 +16,8 @@ import java.time.format.DateTimeFormatter;
 @RestController("userServicePublicApiController")
 @RequestMapping("/user-service/p")
 public class PublicAPIController {
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private LocalDateTime bootTime;
 
     @PostConstruct
@@ -29,7 +30,34 @@ public class PublicAPIController {
         LocalDateTime currentTime = LocalDateTime.now();
         Duration uptime = Duration.between(bootTime, currentTime);
 
-        return new HealthResponse(currentTime, bootTime, uptime);
+        return new HealthResponse(
+                currentTime.format(formatter),
+                bootTime.format(formatter),
+                formatDuration(uptime)
+        );
+    }
+
+    private String formatDuration(Duration duration) {
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+        long seconds = duration.toSecondsPart();
+        long millis = duration.toMillisPart();
+
+        StringBuilder formatted = new StringBuilder();
+        if (hours > 0) {
+            formatted.append(hours).append("h ");
+        }
+        if (minutes > 0) {
+            formatted.append(minutes).append("m ");
+        }
+        if (seconds > 0) {
+            formatted.append(seconds).append("s ");
+        }
+        if (millis > 0) {
+            formatted.append(millis).append("ms");
+        }
+
+        return formatted.toString().trim();
     }
 
     @Getter
@@ -37,8 +65,8 @@ public class PublicAPIController {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class HealthResponse {
-        private LocalDateTime currentTime;
-        private LocalDateTime bootTime;
-        private Duration uptime;
+        private String currentTime;
+        private String bootTime;
+        private String uptime;
     }
 }
