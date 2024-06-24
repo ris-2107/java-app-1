@@ -2,13 +2,17 @@ package com.deliverreez.javaservice.services.userservice.src.service;
 
 import com.deliverreez.javaservice.services.userservice.src.model.User;
 import com.deliverreez.javaservice.services.userservice.src.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
@@ -39,9 +43,17 @@ public class UserService implements IUserService {
         return userRepository.findAll();
     }
 
+    @Async
+    @Transactional
+    public void registerUserAsync(User user) {
+        log.info("Processing user registration asynchronously...");
+        // Perform user registration logic here
+        User registeredUser = registerUser(user);
+        log.info("User registered asynchronously: {}", registeredUser);
+    }
+
     @Override
     public User registerUser(User user) {
-        // Save the user and return the saved User
         return userRepository.save(user);
     }
 }

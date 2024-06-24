@@ -29,9 +29,9 @@ public class RestrictedApiController {
 
     @PostMapping("/register-user")
     public ResponseEntity<DelivereezResponse<User>> registerUser(@Valid @RequestBody User user) {
-        log.info("Request received to register user");
-        User registeredUser = userService.registerUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new DelivereezResponse<>("success", "User registered successfully", registeredUser));
+        log.info("Request received to register user asynchronously");
+        userService.registerUserAsync(user); // Call asynchronous method in service
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new DelivereezResponse<>("accepted", "User registration request accepted", null));
     }
 
     @GetMapping("/users/email/{email}")
