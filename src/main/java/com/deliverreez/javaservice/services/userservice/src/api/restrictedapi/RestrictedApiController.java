@@ -1,6 +1,8 @@
 package com.deliverreez.javaservice.services.userservice.src.api.restrictedapi;
 
+//import com.deliverreez.javaservice.annotations.Authority;
 import com.deliverreez.javaservice.annotations.Authority;
+import com.deliverreez.javaservice.annotations.Restricted;
 import com.deliverreez.javaservice.dtos.DelivereezResponse;
 import com.deliverreez.javaservice.services.userservice.src.model.User;
 import com.deliverreez.javaservice.services.userservice.src.service.UserService;
@@ -17,8 +19,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+
+@Restricted
 @RequestMapping("/user-service/r")
-@Authority
 @RequiredArgsConstructor
 public class RestrictedApiController {
 
@@ -26,6 +29,7 @@ public class RestrictedApiController {
     private final UserService userService;
 
     @PostMapping("/register-user")
+    @Authority
     public ResponseEntity<DelivereezResponse<User>> registerUser(@Valid @RequestBody User user) {
         log.info("Request received to register user asynchronously");
         userService.registerUserAsync(user);

@@ -1,5 +1,6 @@
 package com.deliverreez.javaservice.services.userservice.src.api.publicapi;
 
+import com.deliverreez.javaservice.annotations.Restricted;
 import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
