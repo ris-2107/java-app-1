@@ -12,15 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 @Slf4j
 public class Authority {
-
+  private final String EXPECTED_HEADER = "ExpectedHeaderValue";
   @Autowired private HttpServletRequest request;
 
   @Before(
       "@within(com.deliverreez.javaservice.annotations.Authority) || @annotation(com.deliverreez.javaservice.annotations.Authority)")
   public void checkAuthority() {
     String headerValue = request.getHeader("X-Custom-Header");
-    if (headerValue == null || !headerValue.equals("ExpectedHeaderValue")) {
-      log.info("NOT Authorised to do operation");
+    if (headerValue == null || !headerValue.equals(EXPECTED_HEADER)) {
+      log.error("NOT Authorised to do operation");
     } else {
       log.info("Authorised to do operation");
     }
