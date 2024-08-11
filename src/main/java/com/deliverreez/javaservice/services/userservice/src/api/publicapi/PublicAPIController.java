@@ -1,9 +1,6 @@
 package com.deliverreez.javaservice.services.userservice.src.api.publicapi;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +18,7 @@ public class PublicAPIController {
     private LocalDateTime bootTime;
 
     @PostConstruct
-    public void init() {
+    public void getContainerStartTime() {
         bootTime = LocalDateTime.now();
     }
 
@@ -60,8 +57,7 @@ public class PublicAPIController {
         return formatted.toString().trim();
     }
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class HealthResponse {
