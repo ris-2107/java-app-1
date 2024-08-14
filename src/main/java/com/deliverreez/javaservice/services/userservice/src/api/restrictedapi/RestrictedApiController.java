@@ -17,6 +17,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,26 +53,25 @@ public class RestrictedApiController {
   }
 
   @GetMapping("/users")
-  public Mono<ResponseEntity<DelivereezResponse<Flux<User>>>> getAllUsers() {
-    Mono<ResponseEntity<DelivereezResponse<Flux<User>>>> responseEntityMono =
-        Mono.just(
-                ResponseEntity.ok(
-                    new DelivereezResponse<>(
-                        "success", "All users retrieved", userService.getAllUsers())))
-            .onErrorResume(
-                ex -> {
-                  log.error("Error occurred while fetching users", ex);
-                  return Mono.just(
-                      ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                          .body(
-                              new DelivereezResponse<>(
-                                  "error", "Failed to fetch users", Flux.empty())));
-                });
-
-    responseEntityMono.subscribe(
-        d -> {
-          System.out.println(d);
-        });
-    return responseEntityMono;
+  public Mono<ResponseEntity<DelivereezResponse<List<User>>>> getAllUsers() {
+    return userService
+        .getAllUsers() // Returns Flux<User>
+        .collectList() // Collect all User objects into a List<User>
+        .flatMap(
+            users -> {
+              // For example, adding metadata or enriching the data
+              return Mono.just(
+                  ResponseEntity.ok(
+                      new DelivereezResponse<>("success", "All users retrieved", users)));
+            })
+        .onErrorResume(
+            ex -> { // Error handling
+              log.error("Error occurred while fetching users", ex);
+              return Mono.just(
+                  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                      .body(
+                          new DelivereezResponse<>(
+                              "error", "Failed to fetch users", Collections.emptyList())));
+            });
   }
 }
